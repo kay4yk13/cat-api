@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <v-container class="grey lighten-5">
+
     <v-row align="center">
       <v-col
         cols="12"
@@ -13,69 +14,73 @@
       <v-col
         cols="12"
         sm="3">
-        <v-btn @click="getCatFacts">Get Cat Facts</v-btn> </v-col></v-row>
-    <v-row justify="center">
+        <v-btn
+          @click="getCatFacts">
+          Get Cat Facts
+        </v-btn>
+      </v-col>
+    </v-row>
 
+    <v-row justify="center">
       <v-btn
         color="primary"
         dark
         @click.stop="dialog = true">
         Open Dialog
       </v-btn>
-
-      <!--!!MODAL headers selector-->
-      <v-dialog
-        v-model="dialog"
-        max-width="600">
-        <v-card>
-          <v-card-title class="text-h5">
-            Select headers of cat facts
-          </v-card-title>
-
-          <v-card-text>
-            <template>
-              <v-data-table
-                v-model="selectedHeaders"
-                :items="headersSource"
-                :headers="headersForHeadersSelectModal"
-                :single-select=false
-                item-key="text"
-                show-select
-                class="elevation-1">
-
-              </v-data-table>
-            </template>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="error"
-              @click="dialog = false">
-              Close
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
     </v-row>
+    <!--!!Modal headers selector-->
+    <v-dialog
+      v-model="dialog"
+      max-width="600">
+      <v-card>
+        <v-card-title class="text-h5">
+          Select headers of cat facts
+        </v-card-title>
 
-    <!--!!Actual facts table-->
+        <v-card-text>
+          <template>
+            <v-data-table
+              v-model="selectedHeaders"
+              :items="headersSource"
+              :headers="headersForHeadersSelectModal"
+              :single-select=false
+              item-key="text"
+              show-select
+              class="elevation-1">
 
+            </v-data-table>
+          </template>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="error"
+            @click="dialog = false">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!--!!Facts table-->
     <v-data-table
       :headers="processedSelectedHeaders"
       :items="facts"
       hide-default-footer
       class="elevation-1">
       <template v-slot:item.details="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          color="blue"
-          @click="seeDetails(item._id)">
-          mdi-information-outline
-        </v-icon>
+        <router-link :to="{ name: 'fun fact', params: { id: item._id } }">
+          <v-icon
+            small
+            class="mr-3"
+            color="blue">
+            mdi-information-outline
+          </v-icon>
+        </router-link>
       </template>
     </v-data-table>
-  </div>
+  </v-container>
 </template>
 
 <script lang="ts">
@@ -136,9 +141,6 @@ export default Vue.extend({
     },
     getCatFacts() {
       this.facts = this.$store.getters['getCatFacts'](this.numberOfFacts)
-    },
-    seeDetails(obj: string) {
-      console.log("🚀 | text", obj)
     },
   },
 })

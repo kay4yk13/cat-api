@@ -1,23 +1,22 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import CatFactsTable from '../views/CatFactsTable.vue'
+import FactDetails from '../views/FactDetailsPage.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
     path: '/',
-    name: 'home',
+    name: 'facts',
     component: CatFactsTable
   },
-  // {
-  //   path: '/about/${id}',
-  //   name: 'about',
-  //   // route level code-splitting
-  //   // this generates a separate chunk (about.[hash].js) for this route
-  //   // which is lazy-loaded when the route is visited.
-  //   component: () => import(/* webpackChunkName: "about" */ '../views/FactDetails.vue')
-  // }
+  {
+    path: `/facts/fact-:id`,
+    name: `fun fact`,
+    props:     true,
+    component: FactDetails
+  }
 ]
 
 const router = new VueRouter({
