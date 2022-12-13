@@ -16,9 +16,9 @@
           tile>
           <h3>fun fact</h3>
           <v-img
-          contain
-          max-height="500px"
-            src="https://cataas.com/cat?width=600"></v-img>
+            contain
+            max-height="500px"
+            src="https://cataas.com/cat?width=500"></v-img>
         </v-card>
       </v-col>
       <v-col
@@ -28,7 +28,32 @@
           class="pa-2"
           outlined
           tile>
-          {{ singleFact }}
+          <v-banner
+            color="primary"
+            elevation="22"
+            icon="mdi-information-outline">{{ singleFact.text }}</v-banner>
+          <v-simple-table>
+            <template v-slot:default>
+              <thead>
+                <tr>
+                  <th class="text-left">
+                    Title
+                  </th>
+                  <th class="text-left">
+                    Value
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="(value, key) in singleFact"
+                  :key="key">
+                  <td>{{ key }}</td>
+                  <td>{{ value }}</td>
+                </tr>
+              </tbody>
+            </template>
+          </v-simple-table>
         </v-card>
       </v-col>
     </v-row>
@@ -44,21 +69,20 @@ export default Vue.extend({
   data() {
     return {
       singleFact: {},
-      // factId: 2
     }
   },
 
   props: {
-    id: { required: true }
+    id: { type: String, required: true }
   },
 
   mounted() {
-    this.getSingleFact(this.id)
+    this.getSingleFact()
   },
 
   methods: {
-    getSingleFact(id: string) {
-      this.singleFact = this.$store.getters['getSingleFact'](id)
+    getSingleFact() {
+      this.singleFact = this.$store.getters['getSingleFact'](this.id)
     },
     goBack() {
       this.$router.go(-1)

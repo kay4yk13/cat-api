@@ -1,3 +1,3 @@
 export default {
-    cats: 'https://cat-fact.herokuapp.com/facts'
+ facts: (num:number) => `https://cat-fact.herokuapp.com/facts/?limit=${num}&offset=0`,
   }

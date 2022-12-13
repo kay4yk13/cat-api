@@ -7,7 +7,6 @@ import * as api from '@/api';
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
 
-
 export default new Vuex.Store({
   state: {
     facts: [
@@ -92,7 +91,7 @@ export default new Vuex.Store({
         "used": false
       }
     ],
-    date: null
+    selectedHeaders: [],
   },
   getters: {
     getCatFacts: (state) => (num: number) => {
@@ -103,11 +102,15 @@ export default new Vuex.Store({
   }
 },
   mutations: {
-    SET_FETCHED_FACTS:(state, data) => state.facts = data
+    SET_FETCHED_FACTS:(state, data) => state.facts = data,
+    SET_SELECTED_HEADERS:(state, arr) => state.selectedHeaders = arr
   },
   actions: {
-    fetchData({state, commit}) {
-      // Vue.axios.get(api.default.cats)
+    saveHeaderPreset({commit}, arr) {
+      commit('SET_SELECTED_HEADERS', arr)
+    },
+    fetchData({commit}, num) {
+      // Vue.axios.get(api.default.facts(num))
       // .then((response) => {
       //   commit('SET_FETCHED_FACTS', response.data)})
       // .catch((e) =>

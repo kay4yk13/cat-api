@@ -8,7 +8,7 @@
         <v-select
           :items="[1, 2, 3, 4, 5]"
           v-model="numberOfFacts"
-          label="How many facts do you want?"></v-select>
+          :label="$t('numOfReq')"></v-select>
       </v-col>
 
       <v-col
@@ -29,10 +29,13 @@
         Open Dialog
       </v-btn>
     </v-row>
+
     <!--!!Modal headers selector-->
     <v-dialog
       v-model="dialog"
-      max-width="600">
+      max-width="600"
+      @click:outside="dialog = false"
+      >
       <v-card>
         <v-card-title class="text-h5">
           Select headers of cat facts
@@ -47,17 +50,20 @@
               :single-select=false
               item-key="text"
               show-select
+              hide-default-footer
+              :items-per-page="15"
               class="elevation-1">
-
             </v-data-table>
           </template>
         </v-card-text>
+
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
             color="error"
-            @click="dialog = false">
-            Close
+            @click="applyHeadersSelect"
+            applyHeadersSelect>
+            Save preset
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -65,6 +71,7 @@
 
     <!--!!Facts table-->
     <v-data-table
+      v-if="selectedHeaders.length > 1"
       :headers="processedSelectedHeaders"
       :items="facts"
       hide-default-footer
@@ -110,9 +117,8 @@ export default Vue.extend({
         { text: 'Is Deleted', value: 'deleted' },
         { text: 'Is Used', value: 'used' },
         { text: 'Sent Count', value: 'status.sentCount' },
-        { text: 'Verified', value: 'status.verified' },
-      ] as Header[],
-      selectedHeaders: [],
+        { text: 'Verified', value: 'status.verified' }] as Header[],
+      selectedHeaders: [] as Header[],
       headersForHeadersSelectModal: [
         { text: 'Key by API', value: 'value' },
         { text: "Explanation", value: "text" }
@@ -121,10 +127,9 @@ export default Vue.extend({
   },
 
   computed: {
-    processedSelectedHeaders() {
+    processedSelectedHeaders(): Header[] {
       let col = [{
         text: 'Details',
-        align: 'start',
         value: 'details',
       }]
       return col.concat(this.selectedHeaders)
@@ -132,7 +137,8 @@ export default Vue.extend({
   },
 
   mounted() {
-    this.fetchCats()
+    this.selectedHeaders = this.headersSource
+    // this.fetchCats()
   },
 
   methods: {
@@ -142,6 +148,9 @@ export default Vue.extend({
     getCatFacts() {
       this.facts = this.$store.getters['getCatFacts'](this.numberOfFacts)
     },
+    applyHeadersSelect() {
+      this.$store.dispatch('saveHeaderPreset', this.selectedHeaders)
+    }
   },
 })
 </script>

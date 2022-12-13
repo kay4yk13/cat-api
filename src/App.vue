@@ -10,6 +10,18 @@
       </div>
 
       <v-spacer></v-spacer>
+      <v-btn
+      @click="setLocale('en')"
+      >
+        <span class="mr-2">EN</span>
+      </v-btn>
+      <span class="mr-2">/</span>
+      <v-btn
+      @click="setLocale('ru')"
+      >
+        <span class="mr-2">RU</span>
+      </v-btn>
+      <v-spacer></v-spacer>
 
       <v-btn
         href="https://alexwohlbruck.github.io/cat-facts/docs/"
@@ -36,6 +48,11 @@ export default Vue.extend({
   data: () => ({
     //
   }),
+  methods: {
+    setLocale(locale:string) {
+      this.$i18n.locale = locale
+    }
+  }
   
 });
 </script>
