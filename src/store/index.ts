@@ -7,9 +7,13 @@ import * as api from '@/api';
 Vue.use(Vuex)
 Vue.use(VueAxios, axios)
 
+declare interface Facts {
+  [propName: string]: any
+}
+
 export default new Vuex.Store({
   state: {
-    facts: [
+    factsFromPrevSuccessfulResponse: [
       {
         "status": {
           "verified": true,
@@ -91,32 +95,84 @@ export default new Vuex.Store({
         "used": false
       }
     ],
+    facts: [] as Facts[],
+    headers: [
+      { text: 'status.verified', value: 'status.verified' },
+      { text: 'status.sentCount', value: 'status.sentCount' },
+      { text: '_id', value: '_id' },
+      { text: 'user', value: 'user' },
+      { text: 'text', value: 'text' },
+      { text: '__v', value: '__v' },
+      { text: 'source', value: 'source' },
+      { text: 'createdAt', value: 'createdAt' },
+      { text: 'updatedAt', value: 'updatedAt' },
+      { text: 'deleted', value: 'deleted' },
+      { text: 'used', value: 'used' }],
+
     selectedHeaders: [],
   },
   getters: {
-    getCatFacts: (state) => (num: number) => {
-    return state.facts.slice(0, num)
+    // getHeaders: (state) => {
+    //   let arr: string[] = []
+    //   Object.entries(state.facts[0]).forEach(
+    //     ([key, value]) => {
+    //       if (typeof value != 'object') {
+    //         arr.push(key)
+    //       }
+    //       else {
+    //         Object.entries(value).forEach(e => {
+    //           arr.push(`${key}.${e[0]}`)
+    //         })
+    //       }
+    //     }
+    //   )
+    //   return arr
+    // },
+
+    getHeaders: (state) => {
+      return state.headers
+    },
+    getSelectedHeaders: (state) => {
+      return state.selectedHeaders
+    },
+    getCatFacts: (state) => {
+      return state.facts
+    },
+    getSingleFact: (state) => (id: string) => {
+      return state.facts.find(fact => fact._id === id)
+    },
+    getBU: (state) => {
+      return state.factsFromPrevSuccessfulResponse
+    },
   },
-  getSingleFact: (state) => (id:string) => {
-    return state.facts.find(fact => fact._id === id)
-  }
-},
+
   mutations: {
-    SET_FETCHED_FACTS:(state, data) => state.facts = data,
-    SET_SELECTED_HEADERS:(state, arr) => state.selectedHeaders = arr
+    SET_FETCHED_FACTS: (state, data) => state.facts = data,
+    SET_SELECTED_HEADERS: (state, arr) => state.selectedHeaders = arr,
+    SET_BACKUP_FACTS: (state) => state.facts = state.factsFromPrevSuccessfulResponse,
   },
+
   actions: {
-    saveHeaderPreset({commit}, arr) {
+    setSelectedHeaders({ commit }, arr) {
       commit('SET_SELECTED_HEADERS', arr)
     },
-    fetchData({commit}, num) {
-      // Vue.axios.get(api.default.facts(num))
-      // .then((response) => {
-      //   commit('SET_FETCHED_FACTS', response.data)})
-      // .catch((e) =>
-      // console.log(e))
-      console.log('i will fetch another time, api down)')
-  },},
+    fetchData({ commit }, num?: number) {
+      return new Promise((resolve, reject) => {
+        console.log(num)
+        Vue.axios.get(num ? api.default.factsWithNum(num) : api.default.facts)
+          .then((response) => {
+            resolve(response);
+            commit('SET_FETCHED_FACTS', response.data)
+          })
+          .catch((e) => {
+            commit('SET_BACKUP_FACTS')
+            reject(e)
+          }
+          )
+      })
+    },
+
+  },
   modules: {
   }
 })

@@ -1,9 +1,8 @@
 <template>
-
   <v-container class="grey lighten-5">
     <v-btn color="primary" @click="goBack">
       <v-icon>mdi-undo</v-icon>
-      Go back
+      {{$t('goBack')}}
     </v-btn>
     <v-row no-gutters>
       <v-col
@@ -14,7 +13,7 @@
           class="pa-2"
           outlined
           tile>
-          <h3>fun fact</h3>
+          <h3>{{$t('funFact')}}</h3>
           <v-img
             contain
             max-height="500px"
@@ -37,10 +36,10 @@
               <thead>
                 <tr>
                   <th class="text-left">
-                    Title
+                    {{$t('title')}}
                   </th>
                   <th class="text-left">
-                    Value
+                    {{$t('value')}}
                   </th>
                 </tr>
               </thead>
@@ -48,8 +47,8 @@
                 <tr
                   v-for="(value, key) in singleFact"
                   :key="key">
-                  <td>{{ key }}</td>
-                  <td>{{ value }}</td>
+                  <td>{{ $t(`tableHeaders.${key}`) }}</td>
+                  <td class="value">{{ value }}</td>
                 </tr>
               </tbody>
             </template>
@@ -94,5 +93,8 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-
+.value {
+  text-decoration: solid;
+  font-size: medium;
+}
 </style>
