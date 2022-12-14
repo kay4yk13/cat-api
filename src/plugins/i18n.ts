@@ -9,7 +9,7 @@ export const i18n = new VueI18n({
   messages: {
     en: {
       header: 'Denis Klimovich, API Test App',
-      numOfReq: 'How many facts do you want?',
+      numOfReq: 'Number of facts to be loaded',
       loadButton: 'Load fun facts',
       loadButtonMsg: 'Data loading...',
       loadError: 'Server Loading error. You will be shown last backuped version of data.',
@@ -43,7 +43,7 @@ export const i18n = new VueI18n({
     },
     ru: {
       header: 'Денис Климович, тестовое приложение с API',
-      numOfReq: 'Сколько интересных фактов нужно загрузить?',
+      numOfReq: 'Сколько Фактов будет загружено',
       loadButton: 'Загрузить факты',
       loadButtonMsg: 'Загружаем...',
       loadError: 'Произошла ошибка загрузки, вам будет показана последняя локальная вресия данных.',

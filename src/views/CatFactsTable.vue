@@ -1,6 +1,56 @@
 <template>
-  <v-container class="grey lighten-5">
-    <v-alert
+  <v-container 
+  class="grey lighten-5">
+    
+      <v-card 
+      class="d-flex justify-space-between mb-12" 
+      color="grey lighten-2" 
+      flat 
+      tile>
+
+        <v-card 
+        class="pa-4 align-self-stretch" 
+        color="grey lighten-2" 
+        outlined tile>
+          {{ $t('numOfReq') }}:  {{ FactsQty }}
+          <v-slider
+            v-model="FactsQty"
+            max="5"
+            min="1"
+            step="1"
+            @change="saveSelectedFactsQty"
+            >
+          </v-slider>
+        </v-card>
+
+        <v-card 
+        class="pa-4 align-self-center align-self-stretch" 
+        color="grey lighten-2" 
+        outlined 
+        tile>
+          <v-btn
+          class="pa-2 align-self-center"
+            :disabled="isLoading"
+            @click="fetchFacts">
+            {{ !isLoading ? $t('loadButton') : $t('loadButtonMsg') }}
+          </v-btn>
+        </v-card>
+
+        <v-card 
+        class="pa-4 align-self-stretch" 
+        color="grey lighten-2" 
+        outlined 
+        tile>
+          <v-btn
+            color="primary"
+            dark
+            @click.stop="openModal">
+            {{ $t('columnsAdj') }}
+          </v-btn>
+        </v-card>
+
+      </v-card>
+      <v-alert
       :value="showAlert"
       color="pink"
       dark
@@ -13,62 +63,20 @@
         <v-btn
           @click="showAlert = false">
           {{ $t('ok') }}
-        </v-btn></span>
+        </v-btn>
+      </span>
     </v-alert>
 
-    <v-col
-      cols="12"
-      sm="6">
-      <v-row align="center">
-        <v-col
-          cols="12"
-          sm="3">
-          <v-text-field
-            v-model="numberOfFacts"
-            type="'integer'"
-            solo
-            :placeholder="$t('numOfReq')">
-          </v-text-field>
-
-          <v-slider
-            v-model="numberOfFacts"
-            max="20"
-            min="0"
-            step="1"></v-slider>
-        </v-col>
-
-        <v-col
-          cols="12"
-          sm="6">
-          <v-btn
-            :disabled="isLoading"
-            @click="fetchFacts">
-            {{ !isLoading ? $t('loadButton') : $t('loadButtonMsg') }}
-          </v-btn>
-        </v-col>
-      </v-row>
-    </v-col>
-    <v-col
-      cols="12"
-      sm="12">
-      <v-row justify="start">
-        <v-btn
-          color="primary"
-          dark
-          @click.stop="dialog = true">
-          {{ $t('columnsAdj') }}
-        </v-btn>
-      </v-row>
-    </v-col>
-
-    <!--!!Modal headers selector-->
+    <!--headers selector modal dialog-->
     <v-dialog
-      v-model="dialog"
+      v-model="modal"
       max-width="750"
-      @click:outside="dialog = false">
+      @click:outside="modal = false"
+      >
 
       <v-card>
-        <v-card-title class="text-h5">
+        <v-card-title 
+        class="text-h5">
           {{ $t('columnsAdjHeadline') }}
         </v-card-title>
         <v-card-text>
@@ -83,7 +91,9 @@
               :items-per-page="15"
               item-key="text"
               class="elevation-1">
-              <template v-slot:item.text="{ item }">
+              <template 
+              v-slot:item.text="{ item }"
+              >
                 {{ $t(`tableHeaders.${item.text}`) }}
               </template>
             </v-data-table>
@@ -91,7 +101,6 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-spacer></v-spacer>
           <v-btn
             color="success"
             @click.stop="applyHeadersSelect">
@@ -102,7 +111,7 @@
       </v-card>
     </v-dialog>
 
-    <!--!!Facts table-->
+    <!--Facts table-->
     <v-data-table
       :headers="tableHeaders"
       :items="catFacts"
@@ -110,9 +119,13 @@
       hide-default-footer
       hide-default-header
       class="elevation-1 table-row">
-      <template v-slot:header="{ props: { headers } }">
+      <template 
+      v-slot:header="{ props: { headers } }"
+      >
         <thead>
-          <th v-for="header in headers">
+          <th 
+          v-for="header in headers"
+          >
             {{ $t(`tableHeaders.${header.text}`) }}
           </th>
         </thead>
@@ -125,16 +138,20 @@
 <script lang="ts">
 import Vue from 'vue'
 
+interface Fact {
+    _id: string
+}
+
 export default Vue.extend({
   name: 'CatFactsTable',
 
   data() {
     return {
       isLoading: false,
-      dialog: false,
+      modal: false,
       showAlert: false,
-      numberOfFacts: 5,
-      selectedHeaders: [],
+      FactsQty: 5,
+      selectedHeaders: new Array as string[],
     }
   },
 
@@ -146,31 +163,39 @@ export default Vue.extend({
       ]
     },
     tableHeaders(): string[] {
-      return this.savedCollectionOfSelectedHeaders ? this.savedCollectionOfSelectedHeaders : this.allHeaders
+      return this.savedHeadersCollection.length ? this.savedHeadersCollection : this.allHeaders
     },
     allHeaders() {
       return this.$store.getters['getHeaders']
     },
-    savedCollectionOfSelectedHeaders() {
+    savedHeadersCollection() {
       return this.$store.getters['getSelectedHeaders']
     },
+    savedFactsQty(){
+      return this.$store.getters['getFactsQty']
+    },
     catFacts() {
-      let n: number = this.numberOfFacts
-      return n ? this.$store.getters['getCatFacts'].slice(0, n) : this.$store.getters['getCatFacts']
+      let n: number = this.FactsQty
+      return n ? this.$store.getters['getCatFactsList'].slice(0, n) : this.$store.getters['getCatFactsList']
     }
   },
 
   mounted() {
     this.setBackSelectedHeaders()
+    this.FactsQty = this.savedFactsQty
   },
 
   methods: {
     setBackSelectedHeaders() {
-      if (this.savedCollectionOfSelectedHeaders) { this.selectedHeaders = this.savedCollectionOfSelectedHeaders }
+     this.selectedHeaders  = this.tableHeaders 
+    },
+    openModal(){
+      this.setBackSelectedHeaders()
+      this.modal = true
     },
     fetchFacts() {
       this.isLoading = true
-      this.$store.dispatch('fetchData', this.numberOfFacts)
+      this.$store.dispatch('fetchData', this.FactsQty)
         .then((response) => {
           this.isLoading = false
         })
@@ -181,11 +206,14 @@ export default Vue.extend({
     },
     applyHeadersSelect() {
       this.$store.dispatch('setSelectedHeaders', this.selectedHeaders)
-      this.dialog = false
+      this.modal = false
+    },
+    saveSelectedFactsQty(){
+      this.$store.dispatch('setFactsQty', this.FactsQty)
     },
 
-    //TODO findout typization issue
-    seeDetails(obj: any) {
+    //TODO find out typification issue
+    seeDetails(obj: Fact) {
       this.$router.push({ name: 'fun fact', params: { id: obj._id } })
     }
   },

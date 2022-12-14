@@ -13,7 +13,9 @@ declare interface Facts {
 
 export default new Vuex.Store({
   state: {
-    factsFromPrevSuccessfulResponse: [
+    // In next code polish iteration we can save last successful response
+    // But now having some backup hardcoded values will provide stability on API failure case
+    backupHardcodedFacts: [
       {
         "status": {
           "verified": true,
@@ -104,14 +106,17 @@ export default new Vuex.Store({
       { text: 'text', value: 'text' },
       { text: '__v', value: '__v' },
       { text: 'source', value: 'source' },
+      { text: 'type', value: 'type' },
       { text: 'createdAt', value: 'createdAt' },
       { text: 'updatedAt', value: 'updatedAt' },
       { text: 'deleted', value: 'deleted' },
       { text: 'used', value: 'used' }],
 
     selectedHeaders: [],
+    factsQty:5
   },
   getters: {
+    //In case of changing structure of API response
     // getHeaders: (state) => {
     //   let arr: string[] = []
     //   Object.entries(state.facts[0]).forEach(
@@ -135,31 +140,34 @@ export default new Vuex.Store({
     getSelectedHeaders: (state) => {
       return state.selectedHeaders
     },
-    getCatFacts: (state) => {
+    getFactsQty: (state) => {
+      return state.factsQty
+    },
+    getCatFactsList: (state) => {
       return state.facts
     },
-    getSingleFact: (state) => (id: string) => {
+    getCatFactsItem: (state) => (id: string) => {
       return state.facts.find(fact => fact._id === id)
-    },
-    getBU: (state) => {
-      return state.factsFromPrevSuccessfulResponse
     },
   },
 
   mutations: {
     SET_FETCHED_FACTS: (state, data) => state.facts = data,
     SET_SELECTED_HEADERS: (state, arr) => state.selectedHeaders = arr,
-    SET_BACKUP_FACTS: (state) => state.facts = state.factsFromPrevSuccessfulResponse,
+    SET_FACTS_QUANTITY:(state, qty) => state.factsQty = qty,
+    SET_BACKUP_FACTS: (state) => state.facts = state.backupHardcodedFacts,
   },
 
   actions: {
     setSelectedHeaders({ commit }, arr) {
       commit('SET_SELECTED_HEADERS', arr)
     },
-    fetchData({ commit }, num?: number) {
+    setFactsQty({ commit }, qty) {
+      commit('SET_FACTS_QUANTITY', qty)
+    },
+    fetchData({ commit }, qty: number) {
       return new Promise((resolve, reject) => {
-        console.log(num)
-        Vue.axios.get(num ? api.default.factsWithNum(num) : api.default.facts)
+        Vue.axios.get(qty !=5 ? api.default.getCatsFactsLimited(qty) : api.default.getCatsFacts)
           .then((response) => {
             resolve(response);
             commit('SET_FETCHED_FACTS', response.data)
@@ -171,8 +179,5 @@ export default new Vuex.Store({
           )
       })
     },
-
   },
-  modules: {
-  }
 })

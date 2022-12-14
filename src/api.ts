@@ -1,4 +1,4 @@
 export default {
- factsWithNum: (num:number) => `https://cat-fact.herokuapp.com/facts?limit=${num}&offset=0`,
- facts: `https://cat-fact.herokuapp.com/facts`,
-  }
+  getCatsFactsLimited: (qty:number) => `https://cat-fact.herokuapp.com/facts?limit=${qty}&offset=0`,
+ getCatsFacts: `https://cat-fact.herokuapp.com/facts`,
+}
